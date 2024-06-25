@@ -1,4 +1,4 @@
-package br.com.alura.api.desafioForumHub.model;
+package br.com.alura.api.desafioForumHub.domain.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode(of = "perfilId")
 @Table(name = "tb_perfis")
-
 public class Perfil {
 
     @Id

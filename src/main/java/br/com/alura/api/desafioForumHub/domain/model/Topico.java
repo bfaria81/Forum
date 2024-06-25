@@ -1,7 +1,8 @@
-package br.com.alura.api.desafioForumHub.model;
+package br.com.alura.api.desafioForumHub.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -15,27 +16,25 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.Instant;
 import java.util.List;
 
-@Data
 @Entity
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(of = "cursoId")
-@Table(name = "tb_cursos")
+@EqualsAndHashCode(of = "topicoId")
+@Table(name = "tb_topicos")
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-public class Curso {
+public class Topico {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "curso_id")
-    private Long cursoId;
+    private Long topicoId;
 
-    @NotBlank
-    private String nome;
+    @NotBlank(message = "Título é obrigatório")
+    private String titulo;
 
-    @NotBlank
-    private String categoria;
-
-    private Boolean status = true;
+    @NotBlank(message = "Mensagem é obrigatória")
+    @Column(columnDefinition = "TEXT CHARACTER SET utf8")
+    private String mensagem;
 
     @CreationTimestamp
     private Instant dataCriacao;
@@ -43,11 +42,18 @@ public class Curso {
     @UpdateTimestamp
     private Instant dataAlteracao;
 
-    @OneToMany(mappedBy = "curso")
-    @JsonManagedReference
-    private List<Topico> topicos;
+    private Boolean status = true;
 
     @ManyToOne
-    @JoinColumn(name = "usuario_id")
-    private Usuario usuario;
+    @JoinColumn(name = "autor_id")
+    private Usuario autor;
+
+    @ManyToOne
+    @JoinColumn(name = "curso_id")
+    @JsonBackReference
+    @JsonIgnore
+    private Curso curso;
+
+    @OneToMany(mappedBy = "topico")
+    private List<Resposta> respostas;
 }

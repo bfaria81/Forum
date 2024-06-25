@@ -1,4 +1,4 @@
-package br.com.alura.api.desafioForumHub.model;
+package br.com.alura.api.desafioForumHub.domain.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;

@@ -1,4 +1,4 @@
-package br.com.alura.api.desafioForumHub.model;
+package br.com.alura.api.desafioForumHub.domain.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Set;
 import java.util.UUID;
