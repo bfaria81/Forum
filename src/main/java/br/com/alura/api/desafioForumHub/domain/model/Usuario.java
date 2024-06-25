@@ -18,7 +18,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @EqualsAndHashCode(of = "usuarioId")
 @Table(name = "tb_usuarios")
-
 public class Usuario {
 
     @Id
