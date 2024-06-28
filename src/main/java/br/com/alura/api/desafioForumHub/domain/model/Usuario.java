@@ -1,5 +1,6 @@
 package br.com.alura.api.desafioForumHub.domain.model;
 
+import br.com.alura.api.desafioForumHub.controller.dto.LoginRequest;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -7,13 +8,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Set;
 import java.util.UUID;
 
 
 @Data
-@Entity(name = "Usuario")
+@Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "usuarioId")
@@ -48,7 +50,7 @@ public class Usuario {
     )
     private Set<Perfil> perfis;
 
-//    public boolean isLoginCorrect(LoginRequest loginRequest, PasswordEncoder passwordEncoder) {
-//        return passwordEncoder.matches(loginRequest.senha(), this.senha);
-//    }
+    public boolean isLoginCorrect(LoginRequest loginRequest, PasswordEncoder passwordEncoder) {
+        return passwordEncoder.matches(loginRequest.senha(), this.senha);
+    }
 }

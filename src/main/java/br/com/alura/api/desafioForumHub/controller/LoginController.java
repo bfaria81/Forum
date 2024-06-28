@@ -1,39 +1,64 @@
 package br.com.alura.api.desafioForumHub.controller;
 
-import br.com.alura.api.desafioForumHub.domain.model.DadosAutenticacao;
-import br.com.alura.api.desafioForumHub.domain.model.Usuario;
+import br.com.alura.api.desafioForumHub.controller.dto.LoginRequest;
+import br.com.alura.api.desafioForumHub.controller.dto.LoginResponse;
+import br.com.alura.api.desafioForumHub.domain.model.Perfil;
 import br.com.alura.api.desafioForumHub.domain.repository.UsuarioRepository;
-import br.com.alura.api.desafioForumHub.infra.config.DadosTokenJWT;
-import br.com.alura.api.desafioForumHub.infra.config.TokenService;
-import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Instant;
+import java.util.stream.Collectors;
+
 @RestController
-@RequestMapping("/login")
 public class LoginController {
 
-    @Autowired
-    private AuthenticationManager manager;
+    private final JwtEncoder jwtEncoder;
+    private final UsuarioRepository usuarioRepository;
+    private BCryptPasswordEncoder passwordEncoder;
 
-    @Autowired
-    private TokenService tokenService;
-
-    @PostMapping
-    public ResponseEntity efetuarLogin(@RequestBody @Valid DadosAutenticacao dados){
-        var authenticationToken = new UsernamePasswordAuthenticationToken(dados.login(), dados.senha());
-        var authentication = manager.authenticate(authenticationToken);
-        var tokenJWT = tokenService.gerarToken((Usuario) authentication.getPrincipal());
-
-        return ResponseEntity.ok(new DadosTokenJWT(tokenJWT));
+    public LoginController(JwtEncoder jwtEncoder,
+                           UsuarioRepository usuarioRepository,
+                           BCryptPasswordEncoder passwordEncoder) {
+        this.jwtEncoder = jwtEncoder;
+        this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
 
+        var usuario = usuarioRepository.findByLogin(loginRequest.login());
+
+        if (usuario.isEmpty() || !usuario.get().isLoginCorrect(loginRequest, passwordEncoder)) {
+            throw new BadCredentialsException("usuário ou senha é inválido!");
+        }
+
+        var agora = Instant.now();
+        var tempoDeExpiracao = 600L; // 600 segundos -> 10 minutos
+
+        var scopes = usuario.get().getPerfis()
+                .stream()
+                .map(Perfil::getNome)
+                .collect(Collectors.joining(" "));
+
+        var claims = JwtClaimsSet.builder()
+                .issuer("forumhub")// quem está gerando o TOKEN
+                .subject(usuario.get().getUsuarioId().toString())// USUÁRIO do TOKEN
+                .issuedAt(agora)
+                .expiresAt(agora.plusSeconds(tempoDeExpiracao))// Tempo De Expiracao do TOKEN
+                .claim("scope", scopes)// scope do usuário
+                .build();
+
+        var jwtValue = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+
+        return ResponseEntity.ok(new LoginResponse(jwtValue, tempoDeExpiracao));
+    }
 }
