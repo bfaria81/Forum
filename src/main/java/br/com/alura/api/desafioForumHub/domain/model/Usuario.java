@@ -13,7 +13,7 @@ import java.util.UUID;
 
 
 @Data
-@Entity
+@Entity(name = "Usuario")
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "usuarioId")

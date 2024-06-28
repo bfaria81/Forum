@@ -1,5 +1,8 @@
-package br.com.alura.api.desafioForumHub.controller.dto.usuario;
+package br.com.alura.api.desafioForumHub.controller;
 
+
+import br.com.alura.api.desafioForumHub.controller.dto.resposta.RespostaDTO;
+import br.com.alura.api.desafioForumHub.controller.dto.resposta.RespostaItemDTO;
 import br.com.alura.api.desafioForumHub.domain.repository.RespostaRepository;
 import br.com.alura.api.desafioForumHub.domain.repository.TopicoRepository;
 import br.com.alura.api.desafioForumHub.domain.repository.UsuarioRepository;
@@ -40,3 +43,4 @@ public class RespostaController {
     }
 
 }
+
