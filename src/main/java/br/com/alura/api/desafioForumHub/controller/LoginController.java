@@ -50,7 +50,7 @@ public class LoginController {
                 .collect(Collectors.joining(" "));
 
         var claims = JwtClaimsSet.builder()
-                .issuer("forumhub")// quem está gerando o TOKEN
+                .issuer("forumhubdb")// quem está gerando o TOKEN
                 .subject(usuario.get().getUsuarioId().toString())// USUÁRIO do TOKEN
                 .issuedAt(agora)
                 .expiresAt(agora.plusSeconds(tempoDeExpiracao))// Tempo De Expiracao do TOKEN
